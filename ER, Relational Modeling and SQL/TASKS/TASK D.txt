@@ -1,0 +1,9 @@
+#TASK D
+
+SELECT assessment.A_CODE AS ASSESSMENT_CODE
+FROM assessment
+WHERE assessment.RE_ID IN (SELECT realestate.RE_ID
+						FROM realestate
+						WHERE realestate.L_CODE IN (SELECT location.L_CODE
+												 FROM location
+												 WHERE location.INCOME > 25000));

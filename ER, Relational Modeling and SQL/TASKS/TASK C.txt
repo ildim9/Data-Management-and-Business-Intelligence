@@ -1,0 +1,7 @@
+#TASK C
+
+SELECT DISTINCT(assessment.RE_ID)
+FROM assessment
+WHERE EXTRACT(YEAR FROM assessment.DATE)=2020
+GROUP BY assessment.RE_ID
+HAVING COUNT(assessment.RE_ID)>2 ;

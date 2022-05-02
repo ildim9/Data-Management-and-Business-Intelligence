@@ -1,0 +1,27 @@
+#ΤASK H
+
+CREATE VIEW AVG_2020 AS
+SELECT LOCATION.L_CODE,AVG(assessment.Price)/realestate.RE_SIZE AS AV_2020
+from location 
+inner join realestate
+on location.L_CODE=realestate.L_CODE
+inner join assessment 
+on realestate.RE_ID=assessment.RE_ID
+WHERE YEAR(assessment.DATE)=2020
+GROUP BY location.L_CODE;
+
+CREATE VIEW AVG_2019 AS 
+SELECT LOCATION.L_CODE,AVG(assessment.Price)/realestate.RE_SIZE  AS AV_2019
+from location 
+inner join realestate
+on location.L_CODE=realestate.L_CODE
+inner join assessment 
+on realestate.RE_ID=assessment.RE_ID
+WHERE YEAR(assessment.DATE)=2019
+GROUP BY location.L_CODE;
+ 
+SELECT LOCATION.L_CODE,(av_2020-av_2019)/av_2019 AS CHANGE_OF_PRICE
+FROM location
+LEFT JOIN AVG_2020 ON (location.L_CODE=AVG_2020.L_CODE)
+LEFT JOIN AVG_2019 ON (location.L_CODE=AVG_2019.L_CODE)
+GROUP BY location.L_CODE;

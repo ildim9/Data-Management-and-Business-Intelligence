@@ -1,0 +1,280 @@
+USE dmbi;
+
+#CREATION OF TABLES
+
+CREATE TABLE `location` (
+  `L_CODE` int NOT NULL,
+  `TITLE` varchar(45) NOT NULL,
+  `POPULATION` int NOT NULL,
+  `INCOME` int NOT NULL,
+  PRIMARY KEY (`L_CODE`)
+);
+
+CREATE TABLE `realestate` (
+  `RE_ID` int NOT NULL,
+  `RE_ADDRESS` varchar(45) NOT NULL,
+  `RE_FLOOR` int NOT NULL,
+  `RE_SIZE` varchar(45) NOT NULL,
+  `RE_YEAR` int NOT NULL,
+  `L_CODE` int NOT NULL,
+  PRIMARY KEY (`RE_ID`),
+  KEY `L_CODE_idx` (`L_CODE`),
+  CONSTRAINT `L_CODE` FOREIGN KEY (`L_CODE`) REFERENCES `location` (`L_CODE`)
+);
+
+CREATE TABLE `auditor` (
+  `AU_ID` int NOT NULL,
+  `FIRST_NAME` varchar(45) NOT NULL,
+  `LAST_NAME` varchar(45) NOT NULL,
+  `AGE` int NOT NULL,
+  `SEX` varchar(45) NOT NULL,
+  `A_ADDRESS` varchar(45) NOT NULL,
+  PRIMARY KEY (`AU_ID`)
+);
+
+CREATE TABLE `assessment` (
+  `A_CODE` int NOT NULL,
+  `PRICE` int NOT NULL,
+  `DATE` date NOT NULL,
+  `AU_ID` int NOT NULL,
+  `RE_ID` int NOT NULL,
+  PRIMARY KEY (`A_CODE`),
+  KEY `AU_ID_idx` (`AU_ID`),
+  KEY `RE_ID_idx` (`RE_ID`),
+  CONSTRAINT `AU_ID` FOREIGN KEY (`AU_ID`) REFERENCES `auditor` (`AU_ID`),
+  CONSTRAINT `RE_ID` FOREIGN KEY (`RE_ID`) REFERENCES `realestate` (`RE_ID`)
+);
+  
+
+CREATE TABLE `offices` (
+  `RE_ID` int NOT NULL,
+  `OWNER_SSN` varchar(45) NOT NULL,
+  PRIMARY KEY (`RE_ID`,`OWNER_SSN`),
+  CONSTRAINT `offices_ibfk_1` FOREIGN KEY (`RE_ID`) REFERENCES `realestate` (`RE_ID`)
+);
+
+CREATE TABLE `houses` (
+  `RE_ID` int NOT NULL,
+  `OWNER_ID` varchar(45) NOT NULL,
+  PRIMARY KEY (`RE_ID`,`OWNER_ID`),
+  CONSTRAINT `houses_ibfk_1` FOREIGN KEY (`RE_ID`) REFERENCES `realestate` (`RE_ID`)
+);
+
+#INSERTION OF DATA
+INSERT INTO location
+VALUES 
+(101,'N.IONIA', 66000,15000),
+(102,'XOLARGOS',90000,41000),
+(103,'PATHSIA',34000,100000),
+(104,'PAPAGOU',20000,80000),
+(105,'PERISTERI',50000,20000),
+(106,'METAKSOURGIO',10000,42000),
+(107,'KIFISIA',70000,97000),
+(108,'ILION',43900,10000),
+(109,'VIKTORIA',50003,7000),
+(110,'KIPSELI',28400,23000);
+
+INSERT INTO realestate
+VALUES
+(1001,'XOREMI 73',2,110,2020,101),
+(1002,'KREONTOS 29',3,90,1867,102),
+(1003,'ANTIGONIS 29',6,120,2001,103),
+(1004,'AMFIARAOU 34',3,130,2020,104),
+(1005,'GERAKIOU 39',2,70,2019,105),
+(1006,'APSOU 30',8,110,2020,106),
+(1007,'THEOFANOUS 12',9,130,2015,107),
+(1008,'DRAGOUMI 29',2,100,1978,108),
+(1009,'KIFISIAS 39',5,170,2020,109),
+(1010,'TSALDARI 20',2,50,1847,110),
+(1011,'APSOU 34',3,110,1950,106);
+
+INSERT INTO auditor
+VALUES
+(1, 'GEORGE', 'PAPANDREOU', 38, 'M', 'MALTEZOY 30'),
+(2, 'JOHN', 'KARAMANLIS', 45, 'M', 'KAPODISTRIA 4'),
+(3, 'IOANNA', 'PAPAMIHAIL', 30, 'F', 'IOAKEIM 78'),
+(4, 'JENNY', 'COBANAJ', 20, 'F', 'BOTSARI 2'),
+(5, 'KONSTANTINOS', 'PETRAKOPOULOS', 55, 'M', 'VENIZELOU 12'),
+(6, 'GEORGIA', 'NASIOU', 46, 'F', 'NIGRITIS 56'),
+(7, 'THEOFILOS', 'PALAIOKOSTAS', 29, 'M', 'SERRWN 99'),
+(8, 'XARILAOS', 'PETRAKOGIANNIS', 30, 'M', 'THESSALONIKIS 6'),
+(9, 'JOHN', 'PAPALOUKAS', 43, 'M', 'FILIS 8'),
+(10, 'CHRYSA', 'MANDYLI', 66, 'F', 'SYNDIKA 71');
+
+INSERT INTO houses 
+VALUES
+(1001,987123),
+(1002,456753),
+(1003,123951),
+(1004,179352),
+(1005,783549);
+
+INSERT INTO offices 
+VALUES
+(1006,937293),
+(1007,938110),
+(1008,382610),
+(1009,398127),
+(1010,293003),
+(1011,131225);
+
+INSERT INTO assessment 
+VALUES
+(10,25000,'2020-10-25',1,1001),
+(11,30000,'2020-12-20',2,1002),
+(12,37200,'2020-12-31',3,1003),
+(13,40000,'2019-12-27',4,1004),
+(14,86400,'2016-12-25',5,1005),
+(15,23400,'2020-12-01',6,1006),
+(16,76300,'2019-11-21',7,1007),
+(17,29999,'2019-12-02',8,1008),
+(18,39200,'2020-12-24',9,1009),
+(19,89000,'2014-09-13',10,1010),
+(20,25000,'2020-10-26',1,1001),
+(21,25000,'2020-10-27',1,1001),
+(22,30000,'2019-05-19',6,1011);
+
+#TASK A
+
+SELECT realestate.RE_ID, realestate.RE_ADDRESS
+FROM realestate, location, assessment
+WHERE realestate.L_CODE=location.L_CODE AND realestate.RE_ID=assessment.RE_ID AND
+location.INCOME > 40000 AND assessment.DATE BETWEEN '2020-12-24' AND '2020-12-31' ;
+
+#TASK B
+
+SELECT count(assessment.A_CODE) AS COUNT_OF_ASSESSEMENTS_IN_2020, auditor.AU_ID, auditor.FIRST_NAME, auditor.LAST_NAME
+FROM assessment
+RIGHT JOIN AUDITOR
+ON assessment.AU_ID=auditor.AU_ID AND YEAR(assessment.DATE)=2020 
+GROUP BY auditor.AU_ID ;
+
+
+#TASK C
+
+SELECT DISTINCT(assessment.RE_ID)
+FROM assessment
+WHERE EXTRACT(YEAR FROM assessment.DATE)=2020
+GROUP BY assessment.RE_ID
+HAVING COUNT(assessment.RE_ID)>2 ;
+
+#TASK D
+
+SELECT assessment.A_CODE AS ASSESSMENT_CODE
+FROM assessment
+WHERE assessment.RE_ID IN (SELECT realestate.RE_ID
+						FROM realestate
+						WHERE realestate.L_CODE IN (SELECT location.L_CODE
+												 FROM location
+												 WHERE location.INCOME > 25000));
+
+#TASK E
+
+SELECT COUNT(assessment.A_CODE) AS TOTAL_ASSESSMENTS_2020
+FROM assessment
+WHERE EXTRACT(YEAR FROM assessment.DATE)=2020 AND assessment.RE_ID IN (SELECT realestate.RE_ID
+																		FROM realestate
+																		WHERE  realestate.L_CODE IN (SELECT location.L_CODE
+																									FROM location
+																									WHERE location.POPULATION > 50000));
+#TASK E (b option)
+
+SELECT COUNT(A_CODE)
+ FROM assessment
+ INNER JOIN REALESTATE
+ ON assessment.RE_ID=realestate.RE_ID
+ INNER JOIN location
+ ON realestate.L_CODE=location.L_CODE
+ WHERE location.POPULATION > 50000 AND YEAR(assessment.date)=2020;
+
+#TASK F
+
+SELECT location.L_CODE AS LOCATION_CODE, AVG(assessment.PRICE)/realestate.RE_SIZE as AVERAGE_PRICE_PER_REALESTATE_SIZE
+FROM location, assessment, realestate
+WHERE location.L_CODE=realestate.L_CODE AND assessment.RE_ID=realestate.RE_ID
+GROUP BY location.L_CODE 
+ORDER BY AVERAGE_PRICE_PER_REALESTATE_SIZE ASC;
+
+#TASK G
+
+CREATE VIEW OFFICES_ASS AS
+SELECT auditor.AU_ID AS AUDITOR_ID, assessment.DATE AS DATE_OF_ASSESSMENT, COUNT(offices.RE_ID) AS TOTAL_OFFICE_ASSESSMENTS_2020
+FROM offices,assessment,auditor
+WHERE offices.RE_ID=assessment.RE_ID
+AND YEAR(assessment.DATE)=2020
+AND assessment.AU_ID=auditor.AU_ID
+GROUP BY auditor.AU_ID ;
+
+CREATE VIEW HOUSES_ASS AS
+SELECT auditor.AU_ID AS AUDITOR_ID,assessment.DATE AS DATE_OF_ASSESSMENT, COUNT(houses.RE_ID) AS TOTAL_HOUSE_ASSESSMENTS_2020
+FROM houses,assessment,auditor
+WHERE houses.RE_ID=assessment.RE_ID
+AND YEAR(assessment.DATE)=2020 
+AND assessment.AU_ID=auditor.AU_ID
+GROUP BY auditor.AU_ID ;
+
+SELECT auditor.AU_ID AS AUDITOR_ID, COALESCE(TOTAL_OFFICE_ASSESSMENTS_2020, 0) AS TOTAL_OFFICE_ASSESSMENTS_2020, COALESCE(TOTAL_HOUSE_ASSESSMENTS_2020, 0) AS TOTAL_HOUSE_ASSESSMENTS_2020
+FROM auditor
+LEFT JOIN HOUSES_ASS ON (auditor.AU_ID=houses_ass.AUDITOR_ID)
+LEFT JOIN OFFICES_ASS ON (auditor.AU_ID=offices_ass.AUDITOR_ID) 
+GROUP BY auditor.AU_ID;
+
+#TASK H
+
+CREATE VIEW AVG_2020 AS
+SELECT LOCATION.L_CODE,AVG(assessment.Price)/realestate.RE_SIZE AS AV_2020
+from location 
+inner join realestate
+on location.L_CODE=realestate.L_CODE
+inner join assessment 
+on realestate.RE_ID=assessment.RE_ID
+WHERE YEAR(assessment.DATE)=2020
+GROUP BY location.L_CODE;
+
+CREATE VIEW AVG_2019 AS 
+SELECT LOCATION.L_CODE,AVG(assessment.Price)/realestate.RE_SIZE  AS AV_2019
+from location 
+inner join realestate
+on location.L_CODE=realestate.L_CODE
+inner join assessment 
+on realestate.RE_ID=assessment.RE_ID
+WHERE YEAR(assessment.DATE)=2019
+GROUP BY location.L_CODE;
+ 
+SELECT LOCATION.L_CODE, COALESCE(((av_2020-av_2019)/av_2019), 0 ) AS CHANGE_OF_PRICE
+FROM location
+LEFT JOIN AVG_2020 ON (location.L_CODE=AVG_2020.L_CODE)
+LEFT JOIN AVG_2019 ON (location.L_CODE=AVG_2019.L_CODE)
+GROUP BY location.L_CODE;
+
+#TASK I
+
+CREATE VIEW NUMBER_OF_2020_ASSESSMENTS AS
+SELECT COUNT(assessment.A_CODE) AS COUNT_2020
+FROM assessment
+WHERE YEAR(assessment.date)=2020;
+
+CREATE VIEW TOTAL_NUMBER_OF_POPULATION AS
+SELECT SUM(location.POPULATION) AS TOTAL_POPULATION
+FROM location;
+
+SELECT  location.L_CODE AS LOCATION_CODE, COUNT(assessment.A_CODE)/COUNT_2020*100 AS PERCENT_ASSESSMENT, location.POPULATION/TOTAL_POPULATION*100 AS PERCENT_POPULATION
+FROM NUMBER_OF_2020_ASSESSMENTS,TOTAL_NUMBER_OF_POPULATION,realestate
+INNER JOIN location ON (location.L_CODE=realestate.L_CODE) 
+LEFT JOIN assessment ON (realestate.RE_ID = assessment.RE_ID AND YEAR(assessment.DATE)=2020)
+GROUP BY location.L_CODE;
+
+#TASK 5 
+#TO BHMA AYTO STHN SQL DEN XREIAZETAI, EGINE MONAXA GIA NA DOUME AN TREXEI O KWDIKAS DIXWS GROUP BY
+
+SELECT L.L_CODE AS LOCATION_CODE, count/COUNT_2020 AS PERCENT_ASSESSMENT, loc_population/tot_population*100 AS PERCENT_POPULATION
+FROM (
+	SELECT L1.L_CODE
+    , (SELECT COUNT(assessment.A_CODE)*10 FROM assessment,location,realestate WHERE realestate.L_CODE=L1.L_CODE AND assessment.RE_ID=realestate.RE_ID AND YEAR(assessment.DATE)=2020) AS count
+    , (SELECT location.POPULATION FROM location WHERE location.L_CODE=L1.L_CODE) AS loc_population
+    , (SELECT COUNT_2020 FROM NUMBER_OF_2020_ASSESSMENTS) AS count_2020
+    , (SELECT TOTAL_POPULATION FROM TOTAL_NUMBER_OF_POPULATION) AS tot_population
+    FROM (SELECT distinct location.L_CODE FROM location,realestate,assessment WHERE location.L_CODE=realestate.L_CODE AND realestate.RE_ID=assessment.RE_ID) AS L1
+	) AS L ;
+
+

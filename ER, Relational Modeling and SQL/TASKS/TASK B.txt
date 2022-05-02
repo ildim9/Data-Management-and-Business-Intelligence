@@ -1,0 +1,7 @@
+#TASK B
+
+SELECT count(assessment.A_CODE) as COUNT_OF_ASSESSEMENTS_IN_2020, auditor.AU_ID, auditor.FIRST_NAME, auditor.LAST_NAME
+FROM assessment
+right JOIN AUDITOR
+ON assessment.AU_ID=auditor.AU_ID and year(assessment.date)=2020 
+GROUP BY auditor.AU_ID ;

@@ -1,0 +1,7 @@
+#TASK F
+
+SELECT location.L_CODE AS LOCATION_CODE, AVG(assessment.PRICE)/realestate.RE_SIZE as AVERAGE_PRICE_PER_REALESTATE_SIZE
+FROM location, assessment, realestate
+WHERE location.L_CODE=realestate.L_CODE AND assessment.RE_ID=realestate.RE_ID
+GROUP BY location.L_CODE 
+ORDER BY AVERAGE_PRICE_PER_REALESTATE_SIZE ASC;

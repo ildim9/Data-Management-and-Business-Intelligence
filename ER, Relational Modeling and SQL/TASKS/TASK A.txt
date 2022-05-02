@@ -1,0 +1,6 @@
+#TASK A
+
+SELECT realestate.RE_ID, realestate.RE_ADDRESS
+FROM realestate, location, assessment
+WHERE realestate.L_CODE=location.L_CODE AND realestate.RE_ID=assessment.RE_ID AND
+location.INCOME > 40000 AND assessment.DATE BETWEEN '2020-12-24' AND '2020-12-31' ;

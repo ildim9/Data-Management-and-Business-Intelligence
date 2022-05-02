@@ -1,0 +1,18 @@
+#TASK E
+
+SELECT COUNT(assessment.A_CODE) AS TOTAL_ASSESSMENTS_2020
+FROM assessment
+WHERE EXTRACT(YEAR FROM assessment.DATE)=2020 AND assessment.RE_ID IN (SELECT realestate.RE_ID
+									FROM realestate
+									WHERE  realestate.L_CODE IN (SELECT location.L_CODE
+													FROM location
+													WHERE location.POPULATION > 50000));
+#Task E (b option)
+
+SELECT COUNT(A_CODE)
+FROM assessment
+INNER JOIN REALESTATE
+ON assessment.RE_ID=realestate.RE_ID
+INNER JOIN location
+ON realestate.L_CODE=location.L_CODE
+WHERE location.POPULATION > 50000 AND YEAR(assessment.date)=2020;

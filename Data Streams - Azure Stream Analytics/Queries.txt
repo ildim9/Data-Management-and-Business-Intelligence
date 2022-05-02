@@ -1,0 +1,161 @@
+
+# query 1
+
+SELECT  sum(CAST([streaminput].[Amount] as BIGINT)) AS TotalAmount ,System.Timestamp as Time
+into StorageOutput 
+from streaminput
+where CAST([streaminput].[Type]  AS BIGINT ) =0  and CAST([streaminput].[ATMCode] AS BIGINT) =21
+group by  SlidingWindow(minute,10)
+
+#query 2
+
+SELECT  sum(CAST([streaminput].[Amount] as BIGINT)) AS TotalAmount ,System.Timestamp as Time
+into StorageOutput 
+from streaminput
+where CAST([streaminput].[Type]  AS BIGINT ) =1  and CAST([streaminput].[ATMCode] AS BIGINT) =21
+group by  TumblingWindow(hour,1)
+
+
+
+
+
+# query 3 
+
+SELECT  sum(CAST([streaminput].[Amount] as BIGINT)) AS TotalAmount ,System.Timestamp as Time
+into StorageOutput 
+from streaminput
+where CAST([streaminput].[Type]  AS BIGINT ) =1  and CAST([streaminput].[ATMCode] AS BIGINT) =21
+group by   HoppingWindow(minute,60,30)
+
+
+
+
+
+# QUERY 4 
+
+
+
+
+SELECT CAST([streaminput].[AtmCode] as bigint ) as AtmCode, sum(cast([streaminput].[Amount] as bigint)) as TotalAmount,System.Timestamp as time 
+into StorageOutput 
+from streaminput
+where cast([streaminput].[type] as bigint) = 1 
+group by cast([streaminput].[ATMCode] as bigint),SlidingWindow(hour,1)
+
+
+
+
+
+
+
+# QUERY 5
+SELECT  CAST([ReferenceDataInputAtm].[area_code] AS BIGINT) AS AreaCODE , sum(CAST([streaminput].[Amount] as BIGINT)) AS TotalAmount ,System.Timestamp as Time
+into [StorageOutput] 
+from streaminput
+INNER JOIN [ReferenceDataInputAtm]
+ON CAST([ReferenceDataInputAtm].[atm_code] AS BIGINT) = CAST([streaminput].[ATMCode] as BIGINT)
+where CAST([streaminput].[Type]  AS BIGINT ) = 1  
+group by CAST([ReferenceDataInputAtm].[area_code] AS BIGINT) , TumblingWindow(hour,1)
+
+
+
+
+
+# QUERY 5 2ND OPTION 
+
+
+
+SELECT [ReferenceDataInputCustomer].[area_code], SUM([streaminput].[Amount]) as Total_Amount
+into StorageOutput
+from [streaminput]
+TIMESTAMP BY EventEnqueuedUtcTime
+INNER JOIN [ReferenceDataInputCustomer]
+ON [streaminput].[CardNumber]=[ReferenceDataInputCustomer].[card_number]
+GROUP BY [streaminput].[Type] , [ReferenceDataInputCustomer],TublingWindow(hour,1)
+HAVING [streaminput].[Type]=1
+
+
+
+
+# query 6 
+
+SELECT  [referenecedataareainput].[area_city] AS ATMsCity ,
+[ReferenceDataInputCustomer].[gender] AS CustomersGender,
+sum(CAST([streaminput].[Amount] as BIGINT)) AS TotalAmount ,
+System.Timestamp as Time
+into StorageOutput
+from streaminput
+INNER JOIN [ReferenceDataInputCustomer]
+ON  CAST([streaminput].[CardNumber] as BIGINT)  = CAST([ReferenceDataInputCustomer].[card_number] as BIGINT)
+INNER JOIN [ReferenceDataInputAtm]
+ON CAST([ReferenceDataInputAtm].[atm_code] AS BIGINT) = CAST([streaminput].[ATMCode] as BIGINT)
+INNER JOIN [referenecedataareainput]
+ON CAST([ReferenceDataInputAtm].[area_code] AS BIGINT) = CAST([referenecedataareainput].[area_code] as BIGINT)
+group by [ReferenceDataInputCustomer].[gender] ,[referenecedataareainput].[area_city] , TumblingWindow(hour,1)
+
+
+# query 7 
+
+select 1 AS ALERT , 
+CAST([streaminput].[CardNumber] as BIGINT) as CardNumber,
+[ReferenceDataInputCustomer].[last_name] as Lastname,
+[ReferenceDataInputCustomer].[first_name] as FirstName,
+count(*) as  NumberOfTransact,
+System.Timestamp as Time
+into StorageOutput 
+from streaminput
+inner join [ReferenceDataInputCustomer]
+on CAST([ReferenceDataInputCustomer].[card_number] as BIGINT) = CAST([streaminput].[CardNumber] as BIGINT)
+where  CAST([streaminput].[Type]  AS BIGINT ) = 1  
+group by [ReferenceDataInputCustomer].[last_name] ,
+[ReferenceDataInputCustomer].[first_name] ,
+CAST([streaminput].[CardNumber] as BIGINT),SlidingWindow(hour,1)
+having NumberOfTransact = 2 
+
+
+
+# query 8 
+
+select 1 AS ALERT,
+count(*) as Number_of_Different_CustArea_and_AtmArea,
+cast([ReferenceDataInputCustomer].[area_code] as bigint ) as CustomerArea,
+cast([ReferenceDataInputAtm].[area_code] as bigint ) as AtmArea,
+System.Timestamp as Time
+into [StorageOutput]
+from streaminput
+inner join [ReferenceDataInputCustomer]
+on cast([streaminput].[CardNumber] as bigint) = cast([ReferenceDataInputCustomer].[card_number] as bigint)
+inner join [ReferenceDataInputAtm]
+on cast([streaminput].[ATMCode] AS bigint ) = cast([ReferenceDataInputAtm].[atm_code] as bigint)
+where cast([ReferenceDataInputAtm].[area_code] as bigint ) <> cast([ReferenceDataInputCustomer].[area_code] as bigint)
+group by cast([ReferenceDataInputCustomer].[area_code] as bigint ), cast([ReferenceDataInputAtm].[area_code] as bigint ),SlidingWindow(hour,1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
